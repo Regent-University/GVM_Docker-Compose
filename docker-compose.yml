@@ -147,9 +147,12 @@ services:
     # ports:
     #   - 127.0.0.1:3000:80
     depends_on:
-      - vulnerability-tests
-      - configure-openvas
-      - gpg-data
+      vulnerability-tests:
+        condition: service_completed_successfully
+      configure-openvas:
+        condition: service_completed_successfully
+      gpg-data:
+        condition: service_completed_successfully
     networks:
       default:
         aliases:
