@@ -99,6 +99,9 @@ services:
     depends_on:
       - gvmd
 
+  # Sets log level of openvas to the set LOG_LEVEL within the env
+  # and changes log output to /var/log/openvas instead /var/log/gvm
+  # to reduce likelihood of unwanted log interferences
   configure-openvas:
     image: greenbone/openvas-scanner:stable
     volumes:
@@ -115,6 +118,7 @@ services:
         touch /var/log/openvas/openvas.log
         chmod 666 /var/log/openvas/openvas.log
 
+  # shows logs of openvas
   openvas:
     image: greenbone/openvas-scanner:stable
     restart: on-failure
@@ -135,6 +139,8 @@ services:
     image: greenbone/openvas-scanner:stable
     restart: on-failure
     environment:
+      # `service_notus` is set to disable everything but notus,
+      # if you want to utilize openvasd directly removed `OPENVASD_MODE`
       OPENVASD_MODE: service_notus
       GNUPGHOME: /etc/openvas/gnupg
       LISTENING: 0.0.0.0:80
@@ -163,8 +169,8 @@ services:
     restart: on-failure
     hostname: ospd-openvas.local
     cap_add:
-      - NET_ADMIN
-      - NET_RAW
+      - NET_ADMIN # for capturing packages in promiscuous mode
+      - NET_RAW # for raw sockets e.g. used for the boreas alive detection
     security_opt:
       - seccomp=unconfined
       - apparmor=unconfined
